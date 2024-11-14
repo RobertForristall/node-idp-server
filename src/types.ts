@@ -18,8 +18,8 @@ export interface SignupData {
     password: string;
     firstName: string;
     lastName: string;
-    dob: Date;
-    created: Date;
+    dob: string;
+    created: string;
     sequrityQuestions: SequrityQuestion;
     recoveryEmail: string | null;
     recoveryPhoneNumber: string | null;

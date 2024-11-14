@@ -1,15 +1,19 @@
-import { createConnection } from "mysql";
+import { createConnection } from "mysql2";
 
-const db = createConnection({
-    host: process.env.DB_URI,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_DATABASE,
-})
+const createNewConnection = () => {
+    const db = createConnection({
+        host: process.env.DB_URI,
+        user: "root",
+        password: process.env.DB_PASS,
+        database: process.env.DB_DATABASE,
+    })
+    
+    db.connect(err => {
+        if (err) throw err;
+        console.log("API Database connection established successfully")
+    })
 
-db.connect(err => {
-    if (err) throw err;
-    console.log("API Database connection established successfully")
-})
+    return db
+}
 
-export default db
+export default createNewConnection
