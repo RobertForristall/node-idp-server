@@ -12,4 +12,4 @@ db.connect(err => {
     console.log("API Database connection established successfully")
 })
 
-module.exports = db;
+export default db
