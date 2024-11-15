@@ -20,7 +20,12 @@ export interface SignupData {
     lastName: string;
     dob: string;
     created: string;
-    sequrityQuestions: SequrityQuestion;
+    sequrityQuestions: {
+        firstQuestion: string;
+        firstAnswer: string;
+        secondQuestion: string;
+        secondAnswer: string;
+    };
     recoveryEmail: string | null;
     recoveryPhoneNumber: string | null;
     application: string;

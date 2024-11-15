@@ -1,4 +1,5 @@
 import express from "express";
+import validator from "validator";
 
 export function isAuthenticated(
   req: express.Request,
@@ -15,4 +16,8 @@ export function isAuthenticated(
       res.status(401).json("No active session; Redirect to login.");
     }
   });
+}
+
+export function verifyEmail(email: string) {
+  return validator.isEmail(email)
 }
