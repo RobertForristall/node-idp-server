@@ -3,6 +3,7 @@ import app from "../src/index"
 import request from "supertest"
 import TestAgent from "supertest/lib/agent"
 import { testSignupData } from "./test.data"
+import db from "../src/db_conn"
 
 let server: Server | null = null
 let myRequest: InstanceType<typeof TestAgent> | null = null
@@ -10,25 +11,21 @@ let myRequest: InstanceType<typeof TestAgent> | null = null
 beforeAll((done) => {
     server = app.listen(done)
     myRequest = request.agent(server)
+    let waitForDbConnection = true
+    setTimeout(() => {
+        waitForDbConnection = false
+    }, 10000)
+    while (waitForDbConnection && db == null) {
+        
+    }
 })
 
 afterAll((done) => {
     server?.close(done)
+    done()
 })
 
 describe("GET /idp/ping", () => {
-
-    // let server: Server | null = null
-    // let myRequest: InstanceType<typeof TestAgent> | null = null
-
-    // beforeAll((done) => {
-    //     server = app.listen(done)
-    //     myRequest = request.agent(server)
-    // })
-
-    // afterAll((done) => {
-    //     server?.close(done)
-    // })
 
     it("Should return 200", (done) => {
         myRequest?.get("/idp/ping")

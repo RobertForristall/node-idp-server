@@ -3,7 +3,7 @@ import { isAuthenticated, verifyEmail } from "../functions";
 import { Request, Response } from "express";
 import session, { Store } from "express-session";
 import { SignupData } from "../types";
-import createNewConnection from "../db_conn";
+import db from "../db_conn";
 import { recoveryEmailsTableCols, recoveryPhoneNumberTableCols, recoveryResourcesTableCols, securityQuestionsTableCols, usersTableCols } from "../constants";
 import { ResultSetHeader } from "mysql2";
 import { randomUUID } from "crypto";
@@ -51,10 +51,9 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
         insert into Users (${usersTableCols.join(", ")})
         values ('${signupData.email}', '${signupData.password}', false, '${signupData.firstName}', '${signupData.lastName}', '${signupData.dob}', '${signupData.created}', '${signupData.created}');
     `
-    const db = createNewConnection()
-    db.query(userInsertQuery, async (err, result: ResultSetHeader, field) => {
+    db?.query(userInsertQuery, async (err, result: ResultSetHeader, field) => {
         if (err) {
-            db.end()
+            db?.end()
             return res.status(400).json(err)
         }
         // Parse database id for user from response to be used in subsequent queries
@@ -79,26 +78,26 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
             values ('${signupData.recoveryPhoneNumber}', false, '${signupData.created}', '${signupData.created}');
         `
 
-        db.query(verificationQuery, (err, verificationResult: ResultSetHeader, verificationField) => {
+        db?.query(verificationQuery, (err, verificationResult: ResultSetHeader, verificationField) => {
             if (err) {
-                db.end()
+                db?.end()
                 return res.status(400).json(err)
             }
-            db.query(securityQuestionQuery, (err, securityQuestionResult: ResultSetHeader, securityQuestionField) => {
+            db?.query(securityQuestionQuery, (err, securityQuestionResult: ResultSetHeader, securityQuestionField) => {
                 if (err) {
-                    db.end()
+                    db?.end()
                     return res.status(400).json(err)
                 }
                 securityQuestionId = securityQuestionResult.insertId
-                db.query(recoveryEmailQuery, (err, recoveryEmailResult: ResultSetHeader, recoveryEmailField) => {
+                db?.query(recoveryEmailQuery, (err, recoveryEmailResult: ResultSetHeader, recoveryEmailField) => {
                     if (err) {
-                        db.end()
+                        db?.end()
                         return res.status(400).json(err)
                     }
                     recoveryEmailId = recoveryEmailResult.insertId
-                    db.query(recoveryPhoneNumberQuery, (err, recoveryPhoneNumberResult: ResultSetHeader, recoveryPhoneNumberField) => {
+                    db?.query(recoveryPhoneNumberQuery, (err, recoveryPhoneNumberResult: ResultSetHeader, recoveryPhoneNumberField) => {
                         if (err) {
-                            db.end()
+                            db?.end()
                             return res.status(400).json(err)
                         }
                         recoveryPhoneNumberId = recoveryPhoneNumberResult.insertId
@@ -106,13 +105,13 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
                         insert into RecoveryResources (${recoveryResourcesTableCols.join(", ")})
                         values (${userId}, ${securityQuestionId}, ${recoveryEmailId}, ${recoveryPhoneNumberId});
                         `
-                        db.query(recoveryResourcesQuery, (err, recoveryResourcesResult, recoveryResourcesField) => {
+                        db?.query(recoveryResourcesQuery, (err, recoveryResourcesResult, recoveryResourcesField) => {
                             if (err) {
-                                db.end()
+                                db?.end()
                                 return res.status(400).json(err)
                             }
                             res.json("Signup Complete!")
-                            db.end()
+                            db?.end()
                         })
                     })
                 })

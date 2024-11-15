@@ -15,7 +15,6 @@ declare module "express-session" {
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT;
 
 app.use(
   cors({
@@ -69,10 +68,6 @@ app.use("/", (req: express.Request, res: express.Response) => {
   console.log(req.url);
   console.log("Auth failed route");
   res.status(401).json("User is not authenticated!");
-});
-
-app.listen(port, () => {
-  console.log(`Server is running at port ${port}`);
 });
 
 export default app
