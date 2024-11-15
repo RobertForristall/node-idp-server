@@ -46,7 +46,7 @@ describe("POST /idp/signup", () => {
         .send(testSignupData)
         .expect(200)
         .end((err, res) => {
-            if (err) done(err)
+            if (err) return done(err)
             return done()
         })
     })
