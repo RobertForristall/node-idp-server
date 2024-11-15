@@ -39,6 +39,17 @@ const options = {
 
 const sessionStore = new MySQLStore(options);
 
+sessionStore
+  .onReady()
+  .then(() => {
+    // MySQL session store ready for use.
+    console.log("MySQLStore ready");
+  })
+  .catch((error: any) => {
+    // Something went wrong.
+    console.error(error);
+  });
+
 app.use(
   session({
     secret: process.env.EXPRESS_SESSION_SECRET
@@ -51,17 +62,6 @@ app.use(
     cookie: { secure: process.env.STAGE === "prod" ? true : false },
   })
 );
-
-sessionStore
-  .onReady()
-  .then(() => {
-    // MySQL session store ready for use.
-    console.log("MySQLStore ready");
-  })
-  .catch((error: any) => {
-    // Something went wrong.
-    console.error(error);
-  });
 
 app.use("/idp", idpRouter)
 
