@@ -1,3 +1,5 @@
+import { QueryError } from "mysql2";
+
 /**
  * Interface for defining user data returned by the session store
  */
@@ -42,4 +44,11 @@ export interface SequrityQuestion {
     secondAnswer: string;
     created: Date;
     modified: Date;
+}
+
+export interface InternalError {
+    route: string;
+    code: number | null;
+    msg: string | null;
+    queryError: QueryError | null
 }
