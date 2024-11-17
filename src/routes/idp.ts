@@ -38,7 +38,7 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
         if ((key == "recoveryEmail" && value != null) || (key == "recoveryPhoneNumber" && value != null)) recoveryResourceProvided = true
         else {
             // If a required value is null then return an error
-            if (value == null && missingRequiredValue == null) missingRequiredValue = key
+            if (value == null && key != "recoveryEmail" && key != "recoveryPhoneNumber" && missingRequiredValue == null) missingRequiredValue = key
             // If any strings contain a semi-colon return an error since it may be an SQL injection attempt
             if (typeof value == "string" && value.includes(";")) sqlInjectionDetected = true
         }
