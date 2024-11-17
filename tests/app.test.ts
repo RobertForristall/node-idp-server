@@ -2,7 +2,8 @@ import { Server } from "http"
 import app from "../src/index"
 import request from "supertest"
 import TestAgent from "supertest/lib/agent"
-import { testSignupData } from "./test.data"
+import { testInternalError, testSignupData } from "./test.data"
+import {InternalError, SignupData} from "../src/types"
 import db from "../src/db_conn"
 
 let server: Server | null = null
@@ -47,4 +48,80 @@ describe("POST /idp/signup", () => {
             return done()
         })
     })
+
+    it("Should error if a required property is null", (done) => {
+        myRequest?.post("/idp/signup")
+        .send({...testSignupData, password: null})
+        .expect(400)
+        .end((err, res) => {
+            if (err) return done(err)
+            expect(res.body).toBeInstanceOf(testInternalError)
+            expect((res.body as InternalError).route).toBe("/idp/signup")
+            expect((res.body as InternalError).code).toBe(1)
+            expect((res.body as InternalError).route).toBe("Error: password should not be null.")
+            expect((res.body as InternalError).route).toBe(null)
+            return done()
+        })
+    })
+
+    it("Should error if a semi-colon is included", (done) => {
+        myRequest?.post("/idp/signup")
+        .send({...testSignupData, firstName: "robert;"})
+        .expect(400)
+        .end((err, res) => {
+            if (err) return done(err)
+            expect(res.body).toBeInstanceOf(testInternalError)
+            expect((res.body as InternalError).route).toBe("/idp/signup")
+            expect((res.body as InternalError).code).toBe(2)
+            expect((res.body as InternalError).route).toBe("Error: String value contains semi-colon")
+            expect((res.body as InternalError).route).toBe(null)
+            return done()
+        })
+    })
+
+    it("Should error if no recovery resources are provided", (done) => {
+        myRequest?.post("/idp/signup")
+        .send({...testSignupData, recoveryEmail: null, recoveryPhoneNumber: null})
+        .expect(400)
+        .end((err, res) => {
+            if (err) return done(err)
+            expect(res.body).toBeInstanceOf(testInternalError)
+            expect((res.body as InternalError).route).toBe("/idp/signup")
+            expect((res.body as InternalError).code).toBe(3)
+            expect((res.body as InternalError).route).toBe("Error: At least one of the following must be provided: Recovery Email, Recovery Phone Number")
+            expect((res.body as InternalError).route).toBe(null)
+            return done()
+        })
+    })
+
+    it("Should error if no recovery resources are provided", (done) => {
+        myRequest?.post("/idp/signup")
+        .send({...testSignupData, email: "robertf.com"})
+        .expect(400)
+        .end((err, res) => {
+            if (err) return done(err)
+            expect(res.body).toBeInstanceOf(testInternalError)
+            expect((res.body as InternalError).route).toBe("/idp/signup")
+            expect((res.body as InternalError).code).toBe(4)
+            expect((res.body as InternalError).route).toBe("Error: email is not in a valid format")
+            expect((res.body as InternalError).route).toBe(null)
+            return done()
+        })
+    })
+
+    it("Should error if no recovery resources are provided", (done) => {
+        myRequest?.post("/idp/signup")
+        .send({...testSignupData, dob: "2010-01-01"})
+        .expect(400)
+        .end((err, res) => {
+            if (err) return done(err)
+            expect(res.body).toBeInstanceOf(testInternalError)
+            expect((res.body as InternalError).route).toBe("/idp/signup")
+            expect((res.body as InternalError).code).toBe(5)
+            expect((res.body as InternalError).route).toBe("Error: User is not 18+ years of age")
+            expect((res.body as InternalError).route).toBe(null)
+            return done()
+        })
+    })
+
 })

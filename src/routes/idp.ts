@@ -45,13 +45,14 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
     })
     let internalError: InternalError = {route: "/idp/signup", code: null, msg: null, queryError: null}
     if (missingRequiredValue != null) internalError = {...internalError, code: 1, msg: `Error: ${missingRequiredValue} should not be null.`}
-    if (sqlInjectionDetected) internalError = {...internalError, code: 2, msg: "Error: String value contains semi-colon"}
+    else if (sqlInjectionDetected) internalError = {...internalError, code: 2, msg: "Error: String value contains semi-colon"}
     // If no recovery resources are provided then return an error
-    if (!recoveryResourceProvided) internalError = {...internalError, code: 3, msg: `Error: At least one of the following must be provided: Recovery Email, Recovery Phone Number`}
+    else if (!recoveryResourceProvided) internalError = {...internalError, code: 3, msg: `Error: At least one of the following must be provided: Recovery Email, Recovery Phone Number`}
     // If the provided email is not in a valid format then return an error
-    if (!verifyEmail(signupData.email)) internalError = {...internalError, code: 4, msg: "Error: email is not in a valid format"}
+    else if (!verifyEmail(signupData.email)) internalError = {...internalError, code: 4, msg: "Error: email is not in a valid format"}
     // If the user is not old enough (18+) return an error
-    if (differenceInYears(new Date(), parse(signupData.dob, "yyyy-MM-dd", new Date())) < 18) internalError = {...internalError, code: 5, msg: "Error: User is not 18+ years of age"}
+    else if (differenceInYears(new Date(), parse(signupData.dob, "yyyy-MM-dd", new Date())) < 18) internalError = {...internalError, code: 5, msg: "Error: User is not 18+ years of age"}
+    
     if (internalError.code != null) {
         res.status(400).json(internalError)
     } else {
