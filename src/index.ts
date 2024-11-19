@@ -4,6 +4,7 @@ import session from "express-session";
 import cors from "cors";
 import { User } from "./types";
 import idpRouter from "./routes/idp";
+import adminRouter from "./routes/admin";
 const MySQLStore = require("express-mysql-session")(session);
 
 declare module "express-session" {
@@ -63,6 +64,7 @@ app.use(
 );
 
 app.use("/idp", idpRouter)
+app.use("/admin", adminRouter)
 
 app.use("/", (req: express.Request, res: express.Response) => {
   console.log(req.url);

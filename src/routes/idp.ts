@@ -15,7 +15,7 @@ const idpRouter = Router();
  * Un-Authorized Route: Ping the server to check for connectivity
  */
 idpRouter.get("/ping", (req: Request, res: Response) => {
-    res.json("IDP Route Ping Successful!")
+    res.json("IDP Main Route Ping Successful!")
 });
 
 /**
