@@ -21,6 +21,7 @@ export const testSignupData: SignupData = {
 
 export const testInternalError: InternalError = {
     route: "",
+    method: "",
     code: null,
     msg: null,
     queryError: null,

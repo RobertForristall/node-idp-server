@@ -43,7 +43,7 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
             if (typeof value == "string" && value.includes(";")) sqlInjectionDetected = true
         }
     })
-    let internalError: InternalError = {route: "/idp/signup", code: null, msg: null, queryError: null, sessionError: null}
+    let internalError: InternalError = {route: "/idp/signup", method: "POST", code: null, msg: null, queryError: null, sessionError: null}
     if (missingRequiredValue != null) internalError = {...internalError, code: 1, msg: `Error: ${missingRequiredValue} should not be null.`}
     else if (sqlInjectionDetected) internalError = {...internalError, code: 2, msg: "Error: String value contains semi-colon"}
     // If no recovery resources are provided then return an error
@@ -151,7 +151,7 @@ idpRouter.post("/login", (req: Request, res: Response) => {
         if (typeof value == "string" && value.includes(";")) sqlInjectionDetected = true
     })
 
-    let internalError: InternalError = {route: "/idp/login", code: null, msg: null, queryError: null, sessionError: null}
+    let internalError: InternalError = {route: "/idp/login", method: "POST", code: null, msg: null, queryError: null, sessionError: null}
 
     if (missingRequiredValue != null) internalError = {...internalError, code: 1, msg: `Error: ${missingRequiredValue} should not be null.`}
     else if (sqlInjectionDetected) internalError = {...internalError, code: 2, msg: "Error: String value contains semi-colon"}
