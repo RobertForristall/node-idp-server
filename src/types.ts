@@ -58,3 +58,15 @@ export interface LoginData {
     password: string;
     applicationName: string;
 }
+
+export interface RoleData {
+    applicationName: string,
+    roleName: string,
+    roleDescription: string
+}
+
+export interface UpdateRoleData {
+    oldApplicationName: string,
+    oldRoleName: string,
+    newRoleData: RoleData
+}

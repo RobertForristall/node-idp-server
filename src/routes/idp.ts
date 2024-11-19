@@ -54,6 +54,7 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
     else if (differenceInYears(new Date(), parse(signupData.dob, "yyyy-MM-dd", new Date())) < 18) internalError = {...internalError, code: 5, msg: "Error: User is not 18+ years of age"}
     //TODO ensure admins can not be made from this route
     //TODO handle removing inserted rows in case of a query error
+    //TODO handle missing recovery resource
     
     if (internalError.code != null) {
         res.status(400).json(internalError)
