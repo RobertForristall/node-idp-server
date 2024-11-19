@@ -23,6 +23,6 @@ export const testInternalError: InternalError = {
     route: "",
     code: null,
     msg: null,
-    queryError: null
-
+    queryError: null,
+    sessionError: null
 }

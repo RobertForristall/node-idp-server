@@ -21,3 +21,10 @@ export function isAuthenticated(
 export function verifyEmail(email: string) {
   return validator.isEmail(email)
 }
+
+export function generateAuditLogInsertQuery(userId: number, event: string, action: string, status: string) {
+  return `
+  insert into AuditLogs (userId, event, action, status, created)
+  values (${userId}, '${event}', '${action}', '${status}', CURRENT_TIMESTAMP())
+  `
+}

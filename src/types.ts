@@ -4,12 +4,10 @@ import { QueryError } from "mysql2";
  * Interface for defining user data returned by the session store
  */
 export interface User {
-    access_token: string;
-    expires_in: number;
-    refresh_token: string;
-    scope: string;
-    token_type: string;
-    id_token: string;
+    email: string;
+    userId: number;
+    application: string;
+    role: string;
 }
 
 /**
@@ -50,5 +48,12 @@ export interface InternalError {
     route: string;
     code: number | null;
     msg: string | null;
-    queryError: QueryError | null
+    queryError: QueryError | null;
+    sessionError: any;
+}
+
+export interface LoginData {
+    email: string;
+    password: string;
+    applicationName: string;
 }
