@@ -1,7 +1,6 @@
 import { Router } from "express";
-import { generateAuditLogInsertQuery, isAuthenticated, verifyEmail } from "../functions";
+import { generateAuditLogInsertQuery, verifyEmail } from "../functions";
 import { Request, Response } from "express";
-import session, { Store } from "express-session";
 import { InternalError, LoginData, SignupData } from "../types";
 import db from "../db_conn";
 import { recoveryEmailsTableCols, recoveryPhoneNumberTableCols, recoveryResourcesTableCols, securityQuestionsTableCols, usersTableCols } from "../constants";
@@ -90,7 +89,7 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
                 values ('${signupData.recoveryPhoneNumber}', false, '${signupData.created}', '${signupData.created}');
             `
             const roleQuery = `
-            select id from Role where applicationName = ${signupData.application} and roleName = ${signupData.role};
+            select id from Roles where applicationName = ${signupData.application} and roleName = ${signupData.role};
             `
             const auditLogQuery = generateAuditLogInsertQuery(userId, "IDP", "Signup", "Success")
 
