@@ -12,20 +12,14 @@ adminRouter.get("ping", isAuthenticated, isAdmin, (req: Request, res: Response) 
 })
 
 /**
- * IDP Admin route for getting all roles for the application that the user is an admin for and what users have those roles
+ * IDP Admin route for getting all roles for an application
  */
 adminRouter.get("/roles", isAuthenticated, isAdmin, (req: Request, res: Response) => {
-    const applicationName: string | null = req.params.applicationName
     let internalError: InternalError = {route: "/admin/roles", method: "GET", code: null, msg: null, queryError: null, sessionError: null}
-    if (applicationName) {
+    if (req.query.applicationName) {
+        const applicationName: string = req.query.applicationName as string
         const queryStr = `
-            select u.id, u.email, r.roleName, r.roleDescription
-            from Users u
-            inner join AssignedRoles ar 
-            on u.id = ar.userId 
-            inner join Roles r 
-            on ar.roleId = r.id
-            where r.applicationName = '${applicationName}';
+            select * from Roles where applicationName = '${applicationName}';
         `
         db?.query(queryStr, (err, results, fields) => {
             if (err) return res.status(400).json({...internalError, code: 1, queryError: err})
@@ -78,10 +72,10 @@ adminRouter.put("/roles", isAuthenticated, isAdmin, (req: Request, res: Response
  * IDP Admin route for deleting existing roles for the application that the user is an admin for
  */
 adminRouter.delete("/roles", isAuthenticated, isAdmin, (req: Request, res: Response) => {
-    const applicationName: string | null = req.params.applicationName
-    const roleName: string | null = req.params.roleName
     let internalError: InternalError = {route: "/admin/roles", method: "DELETE", code: null, msg: null, queryError: null, sessionError: null}
-    if (applicationName && roleName) {
+    if (req.query.applicationName && req.query.roleName) {
+        const applicationName: string | null = req.query.applicationName as string
+        const roleName: string | null = req.query.roleName as string
         const queryStr = `
         delete from Roles where applicationName = '${applicationName}' and roleName = '${roleName}';
         `
@@ -90,13 +84,75 @@ adminRouter.delete("/roles", isAuthenticated, isAdmin, (req: Request, res: Respo
             return res.json(result)
         })
     } else {
-        res.status(400).json({...internalError, code: 2, msg: `Error: ${applicationName ? applicationName : roleName} is missing`})
+        res.status(400).json({...internalError, code: 2, msg: `Error: ${req.query.applicationName ? "applicationName" : "roleName"} is missing`})
+    }
+})
+
+/**
+ * IDP Admin route for getting all roles for the application that the user is an admin for and what users have those roles
+ */
+adminRouter.get("/assigned-roles", isAuthenticated, isAdmin, (req: Request, res: Response) => {
+    let internalError: InternalError = {route: "/admin/assigned-roles", method: "GET", code: null, msg: null, queryError: null, sessionError: null}
+    if (req.query.applicationName) {
+        const applicationName: string = req.query.applicationName as string
+        const queryStr = `
+            select u.id, u.email, r.roleName, r.roleDescription
+            from Users u
+            inner join AssignedRoles ar 
+            on u.id = ar.userId 
+            inner join Roles r 
+            on ar.roleId = r.id
+            where r.applicationName = '${applicationName}';
+        `
+        db?.query(queryStr, (err, results, fields) => {
+            if (err) return res.status(400).json({...internalError, code: 1, queryError: err})
+            return res.json(results)
+        })
+    } else {
+        res.status(400).json({...internalError, code: 2, msg: "Error: applicationName is null"})
+    }
+})
+
+/**
+ * IDP Admin route for updating a role assigned to a User
+ */
+adminRouter.put("/assigned-roles", isAuthenticated, isAdmin, (req: Request, res: Response) => {
+    let internalError: InternalError = {route: "/admin/assigned-roles", method: "PUT", code: null, msg: null, queryError: null, sessionError: null}
+    if (req.query.userId && req.query.oldRoleId && req.query.newRoleId) {
+        const userId = req.query.userId as string
+        const oldRoleId = req.query.oldRoleId as string
+        const newRoleId = req.query.newRoleId as string
+        const queryStr = `
+            update AssignedRoles ar set roleId = ${newRoleId} where ar.userId = ${userId} and ar.roleId = ${oldRoleId};
+        `
+        db?.query(queryStr, (err, results, fields) => {
+            if (err) return res.status(400).json({...internalError, code: 1, queryError: err})
+            return res.json(results)
+        })
+    } else {
+        res.status(400).json({...internalError, code: 2, msg: `Error: ${req.query.userId ? "userId" : (req.query.oldRoleId ? "roleId" : "applicationName")} is missing`})
     }
 })
 
 /**
  * IDP Admin route for getting all audit logs recorded by the IDP server for a specific application
  */
+adminRouter.get("audit-logs", isAuthenticated, isAdmin, (req: Request, res: Response) => {
+    let internalError: InternalError = {route: "/admin/audit-logs", method: "GET", code: null, msg: null, queryError: null, sessionError: null}
+    if (req.query.applicationName) {
+        const applicationName: string | null = req.query.applicationName as string
+        const queryStr = `
+            select * from AuditLogs al
+            where al.event = '${applicationName}';
+        `
+        db?.query(queryStr, (err, results, fields) => {
+            if (err) return res.status(400).json({...internalError, code: 1, queryError: err})
+            return res.json(results)
+        })
+    } else {
+        res.status(400).json({...internalError, code: 2, msg: "Error: applicationName is null"})
+    }
+})
 
 const checkRolesPostData = (roleData: RoleData, method: string): InternalError => {
     let internalError: InternalError = {route: "/admin/roles", method: method, code: null, msg: null, queryError: null, sessionError: null}
