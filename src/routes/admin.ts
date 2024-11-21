@@ -84,7 +84,7 @@ adminRouter.delete("/roles", isAuthenticated, isAdmin, (req: Request, res: Respo
             return res.json(result)
         })
     } else {
-        res.status(400).json({...internalError, code: 2, msg: `Error: ${req.query.applicationName ? "applicationName" : "roleName"} is missing`})
+        res.status(400).json({...internalError, code: 2, msg: `Error: ${req.query.applicationName ? "roleName" : "applicationName"} is missing`})
     }
 })
 
@@ -130,7 +130,7 @@ adminRouter.put("/assigned-roles", isAuthenticated, isAdmin, (req: Request, res:
             return res.json(results)
         })
     } else {
-        res.status(400).json({...internalError, code: 2, msg: `Error: ${req.query.userId ? "userId" : (req.query.oldRoleId ? "roleId" : "applicationName")} is missing`})
+        res.status(400).json({...internalError, code: 2, msg: `Error: ${req.query.userId == undefined ? "userId" : (req.query.oldRoleId ? "newRoleId" : "oldRoleId")} is missing`})
     }
 })
 
