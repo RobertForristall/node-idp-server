@@ -1,5 +1,10 @@
 import express from "express";
+import { MailOptions } from "nodemailer/lib/sendmail-transport";
 import validator from "validator";
+import mailer from "./mailer";
+import dotenv from "dotenv";
+
+dotenv.config()
 
 export function isAuthenticated(
   req: express.Request,
@@ -44,4 +49,15 @@ export function generateAuditLogInsertQuery(userId: number, event: string, actio
   insert into AuditLogs (userId, event, action, status, created)
   values (${userId}, '${event}', '${action}', '${status}', CURRENT_TIMESTAMP())
   `
+}
+
+export function sendVerificationEmail(email: string, verificationToken: string) {
+  const mailOptions: MailOptions = {
+    from: process.env.MAILER_EMAIL,
+    to: email,
+    subject: "Verification email from Forristall IDP Services",
+    html: `
+      
+    `
+  }
 }

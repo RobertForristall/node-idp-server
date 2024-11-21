@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { generateAuditLogInsertQuery, verifyEmail } from "../functions";
+import { generateAuditLogInsertQuery, sendVerificationEmail, verifyEmail } from "../functions";
 import { Request, Response } from "express";
 import { InternalError, LoginData, SignupData } from "../types";
 import db from "../db_conn";
@@ -72,9 +72,10 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
             var securityQuestionId: number | null
             var recoveryEmailId: number | null
             var recoveryPhoneNumberId: number | null
+            const verificationToken = randomUUID();
             const verificationQuery = `
                 insert into Verification (userId, verificationToken)
-                values (${userId}, '${randomUUID()}');
+                values (${userId}, '${verificationToken}');
             `
             const securityQuestionQuery = `
                 insert into SecurityQuestions (${securityQuestionsTableCols.join(", ")})
@@ -123,6 +124,7 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
                                         if (err) return res.status(400).json({...internalError, code: 6, queryError: err})
                                         db?.query(auditLogQuery, (err, auditLogResult, fields) => {
                                             if (err) return res.status(400).json({...internalError, code: 6, queryError: err})
+                                            sendVerificationEmail(signupData.email, verificationToken)
                                             res.json("Signup Complete!")
                                         })
                                     })
