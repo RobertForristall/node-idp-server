@@ -1,4 +1,4 @@
-import { InternalError, SignupData } from "../src/types";
+import { InternalError, LoginData, SignupData } from "../src/types";
 
 export const testSignupData: SignupData = {
     "email": "supertest@tester.com",
@@ -26,4 +26,10 @@ export const testInternalError: InternalError = {
     msg: null,
     queryError: null,
     sessionError: null
+}
+
+export const testLoginData: LoginData = {
+    email: testSignupData.email,
+    password: testSignupData.password,
+    applicationName: "test"
 }

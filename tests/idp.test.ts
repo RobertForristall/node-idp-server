@@ -2,7 +2,7 @@ import { Server } from "http"
 import app from "../src/index"
 import request from "supertest"
 import TestAgent from "supertest/lib/agent"
-import { testInternalError, testSignupData } from "./test.data"
+import { testInternalError, testLoginData, testSignupData } from "./test.data"
 import {InternalError, SignupData} from "../src/types"
 import db from "../src/db_conn"
 
@@ -19,6 +19,10 @@ beforeAll((done) => {
     while (waitForDbConnection && db == null) {
         
     }
+    db?.query("insert into Roles (applicationName, roleName, roleDescription) values ('test', 'test', '');", (err, results, fields) => {
+        if (err) return done(err)
+    })
+    done()
 })
 
 afterAll((done) => {
@@ -119,4 +123,52 @@ describe("POST /idp/signup", () => {
         })
     })
 
+})
+
+describe("GET /idp/verify", () => {
+    let verificationToken: string | null = null
+    let testUserId: number | null = null
+
+    beforeAll((done) => {
+        const queryStr = `
+            select u.id, v.verificationToken
+            from Users u
+            inner join Verification v
+            on u.id = v.userId
+            where u.email = '${testSignupData.email}';
+        `
+        db?.query(queryStr, (err, results, fields) => {
+            if (err) return done(err)
+            const resultArray = results as Array<{id: number, verificationToken: string}>
+            testUserId = resultArray[0].id
+            verificationToken = resultArray[0].verificationToken
+            return done()
+        })
+    })
+
+    it("Should verify the test user successfully", (done) => {
+        myRequest?.get("/idp/verify")
+            .query({userId: testUserId, verificationToken: verificationToken})
+            .send()
+            .expect(200)
+            .end((err, res) => {
+                if (err) return done(err)
+                expect(res.body).toBe("User Verified!")
+                return done()
+            })
+    })
+})
+
+describe("POST /idp/login", () => {
+
+    it("Should login the user and return a cookie for the session", (done) => {
+        myRequest?.post("/idp/login")
+            .send(testLoginData)
+            .expect(200)
+            .end((err, res) => {
+                if (err) return done(err)
+                // TODO check for cookie
+                return done()
+            })
+    })
 })
