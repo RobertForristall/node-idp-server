@@ -137,7 +137,7 @@ adminRouter.put("/assigned-roles", isAuthenticated, isAdmin, (req: Request, res:
 /**
  * IDP Admin route for getting all audit logs recorded by the IDP server for a specific application
  */
-adminRouter.get("audit-logs", isAuthenticated, isAdmin, (req: Request, res: Response) => {
+adminRouter.get("/audit-logs", isAuthenticated, isAdmin, (req: Request, res: Response) => {
     let internalError: InternalError = {route: "/admin/audit-logs", method: "GET", code: null, msg: null, queryError: null, sessionError: null}
     if (req.query.applicationName) {
         const applicationName: string | null = req.query.applicationName as string
