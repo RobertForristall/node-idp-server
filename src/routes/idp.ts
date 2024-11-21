@@ -90,7 +90,7 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
                 values ('${signupData.recoveryPhoneNumber}', false, '${signupData.created}', '${signupData.created}');
             `
             const roleQuery = `
-            select id from Roles where applicationName = ${signupData.application} and roleName = ${signupData.role};
+            select id from Roles where applicationName = '${signupData.application}' and roleName = '${signupData.role}';
             `
             const auditLogQuery = generateAuditLogInsertQuery(userId, "IDP", "Signup", "Success")
 
@@ -186,6 +186,24 @@ idpRouter.post("/login", (req: Request, res: Response) => {
                 res.json("Login Successful!")
             })
         })
+    }
+})
+
+idpRouter.get("/verify", (req: Request, res: Response) => {
+    const internalError: InternalError = {route: "/idp/verify", method: "GET", code: null, msg: null, queryError: null, sessionError: null}
+    const userId = req.query.userId
+    const verificationToken = req.query.verificationToken
+    if (verificationToken && userId) {
+        const queryStr = `update Users set verified = true where id = (select userId from Verification where verificationToken = '${verificationToken}' and userId = ${userId});`
+        db?.query(queryStr, (err, result: ResultSetHeader, fields) => {
+            console.log(err)
+            console.log(result)
+            if (err) return res.status(400).json({...internalError, code: 2, queryError: err})
+            if (result.affectedRows != 1) return res.status(400).json({...internalError, code: 3, msg: "Error: no match for provided userId and verificationToken"})
+            return res.json("User Verified!")
+        })
+    } else {
+        res.status(400).json({...internalError, code: 1, msg: `Error: ${verificationToken ? "userId" : "verificationToken"} is missing`})
     }
 })
 
