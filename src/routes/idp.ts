@@ -124,7 +124,7 @@ idpRouter.post("/signup", (req: Request, res: Response) => {
                                         if (err) return res.status(400).json({...internalError, code: 6, queryError: err})
                                         db?.query(auditLogQuery, (err, auditLogResult, fields) => {
                                             if (err) return res.status(400).json({...internalError, code: 6, queryError: err})
-                                            sendVerificationEmail(signupData.email, verificationToken)
+                                            sendVerificationEmail(signupData.email, userId, verificationToken)
                                             res.json("Signup Complete!")
                                         })
                                     })

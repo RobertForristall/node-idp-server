@@ -51,13 +51,19 @@ export function generateAuditLogInsertQuery(userId: number, event: string, actio
   `
 }
 
-export function sendVerificationEmail(email: string, verificationToken: string) {
+export function sendVerificationEmail(email: string, userId: number,  verificationToken: string) {
+  const verificationLink = (process.env.SSL ? "https" : "http") + "://" + process.env.HOST + ":" + process.env.PORT + "/idp/verify?userId=" + userId + "&verificationToken=" + verificationToken
   const mailOptions: MailOptions = {
     from: process.env.MAILER_EMAIL,
     to: email,
     subject: "Verification email from Forristall IDP Services",
     html: `
-      
+      <div>
+        <h1>Forristall IDP User Verification</h1>
+        <p>Please click the following link to verify the user: ${verificationLink}</p>
+      </div>
     `
   }
+  console.log(mailOptions)
+  mailer.sendMail(mailOptions)
 }
