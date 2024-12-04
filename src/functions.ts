@@ -67,3 +67,21 @@ export function sendVerificationEmail(email: string, userId: number,  verificati
   console.log(mailOptions)
   mailer.sendMail(mailOptions)
 }
+
+export function sendRecoveryEmail(email: string, userId: number,  verificationToken: string) {
+  const verificationLink = (process.env.SSL ? "https" : "http") + "://" + process.env.HOST + ":" + process.env.PORT + "/idp/recover?userId=" + userId + "&verificationToken=" + verificationToken
+  const mailOptions: MailOptions = {
+    from: process.env.MAILER_EMAIL,
+    to: email,
+    subject: "Recovery email from Forristall IDP Services",
+    html: `
+      <div>
+        <h1>Forristall IDP User Recovery</h1>
+        <p>Please click the following link to recover the user and set a new password: ${verificationLink}</p>
+        <p>If this was not requested by you then please disregard this email.</p>
+      </div>
+    `
+  }
+  console.log(mailOptions)
+  mailer.sendMail(mailOptions)
+}

@@ -70,3 +70,10 @@ export interface UpdateRoleData {
     oldRoleName: string,
     newRoleData: RoleData
 }
+
+export interface RecoveryData {
+    userId: number,
+    email: string,
+    phone: string,
+    resource: "email" | "phone"
+}

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { generateAuditLogInsertQuery, sendVerificationEmail, verifyEmail } from "../functions";
+import { generateAuditLogInsertQuery, sendVerificationEmail, verifyEmail, sendRecoveryEmail } from "../functions";
 import { Request, Response } from "express";
-import { InternalError, LoginData, SignupData } from "../types";
+import { InternalError, LoginData, RecoveryData, SignupData } from "../types";
 import db from "../db_conn";
 import { recoveryEmailsTableCols, recoveryPhoneNumberTableCols, recoveryResourcesTableCols, securityQuestionsTableCols, usersTableCols } from "../constants";
 import { ResultSetHeader } from "mysql2";
@@ -204,6 +204,24 @@ idpRouter.get("/verify", (req: Request, res: Response) => {
         })
     } else {
         res.status(400).json({...internalError, code: 1, msg: `Error: ${verificationToken ? "userId" : "verificationToken"} is missing`})
+    }
+})
+
+idpRouter.post("/forgot", (req: Request, res: Response) => {
+    const internalError: InternalError = {route: "/idp/forgot", method: "POST", code: null, msg: null, queryError: null, sessionError: null}
+    const recoveryData: RecoveryData = req.body
+    const recoveryCode = randomUUID()
+    //TODO handle errors
+    if (recoveryData.phone) {
+        // TODO Handle phone resource based account recovery
+    } else {
+        const queryStr = `
+            insert into EmailRecoveryCode (userId, code) values (${recoveryData.userId}, '${recoveryCode}');
+        `
+        db?.query(queryStr, (err, results, fields) => {
+            if (err) return res.status(400).json({...internalError, code: 1, queryError: err})
+            sendRecoveryEmail(recoveryData.email, recoveryData.userId, recoveryCode)
+        })
     }
 })
 
