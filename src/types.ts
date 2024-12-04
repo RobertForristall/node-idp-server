@@ -47,9 +47,9 @@ export interface SequrityQuestion {
 export interface InternalError {
     route: string;
     method: string;
-    code: number | null;
-    msg: string | null;
-    queryError: QueryError | null;
+    code: number | undefined;
+    msg: string | undefined;
+    queryError: QueryError | undefined;
     sessionError: any;
 }
 

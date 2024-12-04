@@ -3,6 +3,8 @@ import { MailOptions } from "nodemailer/lib/sendmail-transport";
 import validator from "validator";
 import mailer from "./mailer";
 import dotenv from "dotenv";
+import { InternalError } from "./types";
+import { QueryError } from "mysql2";
 
 dotenv.config()
 
@@ -38,6 +40,18 @@ export function isAdmin(
       res.status(403).json("User does not have the authorization to access this route.")
     }
   })
+}
+
+export function createBaseInternalError(route: string, method: string, code: number, msg: string): InternalError {
+  return {route, method, code, msg} as InternalError
+}
+
+export function createQueryInternalError(route: string, method: string, code: number, queryError: QueryError): InternalError {
+  return {route, method, code, queryError} as InternalError
+}
+
+export function createSessionInternalError(route: string, method: string, code: number, sessionError: any): InternalError {
+  return {route, method, code, sessionError} as InternalError
 }
 
 export function verifyEmail(email: string) {
